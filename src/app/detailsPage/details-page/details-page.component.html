@@ -1,0 +1,11 @@
+<router-outlet>
+    <div *ngIf="pokemon">
+        <h1>{{ pokemon.name | titlecase }}</h1>
+        <img [src]="pokemon.sprites?.other['official-artwork']?.front_default" 
+             alt="{{ pokemon.name }}" 
+             style="width: 200px; height: auto;"/>
+      </div>
+</router-outlet>
+
+
+  

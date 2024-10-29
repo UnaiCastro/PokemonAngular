@@ -1,0 +1,85 @@
+<router-outlet>
+  <div 
+  style="background-color: black; color: white; text-align: center; width: 100%; min-height: 100vh; padding: 20px; box-sizing: border-box;">
+<h1 style="color: white;">Search your priority Pokemon</h1>
+<img src="https://img.icons8.com/color/480/pokeball.png" alt="Pokemon Logo" style="width: 10%; margin-bottom: 5px;">
+
+<div style="display: flex; align-items: center; margin: 10px 0;">
+  <!-- Input para buscar por nombre -->
+  <input 
+    [(ngModel)]="searchTerm" 
+    (input)="onSearch()"
+    placeholder="Search for a Pokémon" 
+    style="width: 200px; margin-right: 10px;"
+  />
+
+  <tui-multi-select
+    placeholder="Seleccione tipos"
+    [formControl]="typeControl"
+    [tuiTextfieldLabelOutside]="true"
+    [(search)]="search"
+  >
+    Pokémon Types
+    <tui-data-list-wrapper
+      *tuiDataList
+      tuiMultiSelectGroup
+      [items]="filter(search)"
+    ></tui-data-list-wrapper>
+  </tui-multi-select>
+
+  <!-- Select para seleccionar estadística -->
+  <tui-select 
+    [(ngModel)]="selectedStat" 
+    (ngModelChange)="onFilterChange()" 
+    [items]="statOptions"
+    placeholder="Select stat" 
+    style="margin-right: 10px;">
+  </tui-select>
+</div>
+
+<div class="row" style="display: flex; flex-wrap: wrap; justify-content: center;">
+  <div
+    *ngFor="let pokemon of filteredPokemonList"
+    class="pokemon-item"
+    style="width: 30%; margin: 10px; background-color: transparent; border: none; text-align: center;"
+  >
+    <div class="card-body" style="display: flex; flex-direction: column; align-items: center;">
+      <!-- Nombre del Pokémon -->
+      <h5 style="color: white; margin-bottom: 10px;">{{ pokemon.name }}</h5>
+
+      <img
+        *ngIf="pokemon.sprites?.other['official-artwork']?.front_default"
+        [src]="pokemon.sprites.other['official-artwork'].front_default"
+        alt="{{ pokemon.name }}"
+        style="width: 50%; margin-bottom: 10px;"
+      />
+
+      <div *ngIf="pokemon.types" style="margin: 10px 0; display: flex; justify-content: center; flex-wrap: wrap;">
+        <img *ngFor="let type of pokemon.types" 
+             [src]="type.iconUrl" 
+             [alt]="type.type.name" 
+             style="width: 100px; height: 30px; margin: 5px; min-width: 50px; min-height: 30px;"/>
+      </div>
+      
+
+      <!-- Botón de "More Info" -->
+      <button tuiButton 
+      type="button" 
+      class="mt-2" 
+      (click)="goToDetail(pokemon.id)">More Details</button>
+
+    </div>
+  </div>
+</div>
+</div>
+</router-outlet>
+
+
+
+
+
+
+
+
+
+
