@@ -1,23 +1,40 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { RouterOutlet,ActivatedRoute  } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AppService } from '../../service/app.service';
 import { TuiScrollbar } from '@taiga-ui/core';
 import { FormsModule } from '@angular/forms';
+import { TuiDataList } from '@taiga-ui/core';
+import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
-import { TuiSelect } from '@taiga-ui/core';
-import { NgForOf } from '@angular/common';
+
+
+import {NgForOf} from '@angular/common';
+import {TuiButton, TuiDropdown} from '@taiga-ui/core';
+import {TuiCheckbox, TuiChevron, TuiSwitch} from '@taiga-ui/kit';
+
 
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import type {TuiBooleanHandler} from '@taiga-ui/cdk';
 import {TUI_DEFAULT_MATCHER, tuiPure} from '@taiga-ui/cdk';
-import {TuiDataList} from '@taiga-ui/core';
 import {TuiDataListWrapper} from '@taiga-ui/kit';
-import { TuiTextfield } from '@taiga-ui/core';
+ 
+const ITEMS: readonly string[] = [
+    'Luke Skywalker',
+    'Leia Organa Solo',
+    'Darth Vader',
+    'Han Solo',
+    'Obi-Wan Kenobi',
+    'Yoda',
+];
+
+
 
 
 @Component({
-  selector: 'app-root',  
+  selector: 'app-main-page',  
   standalone: true,
-  imports: [NgForOf, TuiScrollbar, FormsModule, TuiSelect ,ReactiveFormsModule, TuiDataList, TuiDataListWrapper,  ],
+  imports: [RouterLink, RouterOutlet, CommonModule, TuiScrollbar, FormsModule, NgForOf, TuiButton, TuiCheckbox, TuiChevron, TuiSwitch, TuiDataList, TuiDropdown],
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,12 +44,7 @@ export class MainPageComponent implements OnInit {
   pokemonDetailsList: any[] = [];
   filteredPokemonList: any[] = [];
   searchTerm: string = '';
-  selectedTypes: string[] = [];
-  selectedStat: string = '';
-  pokemonTypes: string[] = []; 
-  typeControl = new FormControl([]);
-  search: string | null = '';
-  statOptions = ['Attack', 'Defense', 'HP', 'Speed', 'Special-attack', 'Special-defense'];
+  isLoading: boolean = true;
 
   constructor(
     private apiService:AppService,    
@@ -41,7 +53,6 @@ export class MainPageComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.loadPokemon()
-    await this.loadPokemonTypes
   }
 
 
@@ -51,37 +62,27 @@ export class MainPageComponent implements OnInit {
       const pokemonPromises = data.results.map((pokemon: any) =>
         this.apiService.getPokemonByUrl(pokemon.url).toPromise()
       );
+      
       this.pokemonDetailsList = await Promise.all(pokemonPromises);
-      this.filteredPokemonList = [...this.pokemonDetailsList];
+      this.filteredPokemonList = [...this.pokemonDetailsList]; // Inicializa la lista filtrada aquí
+      await this.loadTypeIcons();
+      console.log(this.pokemonDetailsList);
     } catch (error) {
       console.error('Error al cargar Pokémon:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  async loadPokemonTypes() {
-    try {
-      const typesData: any = await this.apiService.getAllPokemonTypes().toPromise();
-      this.pokemonTypes = typesData.results.map((type: any) => type.name);
-    } catch (error) {
-      console.error('Error al cargar los tipos de Pokémon:', error);
+  onSearch() {
+    if (this.searchTerm.trim()) {
+      this.filteredPokemonList = this.pokemonDetailsList.filter(pokemon =>
+        pokemon.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    } else {
+      this.filteredPokemonList = [...this.pokemonDetailsList]; // Para mostrar todos si no hay término de búsqueda
     }
   }
-
-  filterPokemon() {
-    this.filteredPokemonList = this.pokemonDetailsList.filter((pokemon) => {
-      const matchesName = pokemon.name.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesType = this.selectedTypes.length === 0 || pokemon.types.some((type: any) => this.selectedTypes.includes(type.type.name));
-
-      // Lógica de filtro para estadística, esta sección está comentada para que pruebes con nombre y tipo primero
-      // const matchesStat = this.selectedStat === '' || pokemon.stats.some(
-      //   (stat: any) => stat.stat.name === this.selectedStat.toLowerCase() && stat.base_stat > 50
-      // );
-
-      // return matchesName && matchesType && matchesStat;
-      return matchesName && matchesType;
-    });
-  }
-
   
 
   async loadTypeIcons() {
@@ -97,19 +98,6 @@ export class MainPageComponent implements OnInit {
 
   goToDetail(pokemonId: number) {
     this.router.navigate(['detail', pokemonId]);
-  }
-
-  onSearch() {
-    this.filterPokemon();
-  }
-
-  onFilterChange() {
-    this.filterPokemon();
-  }
-
-  @tuiPure
-  filter(search: string | null): readonly string[] {
-    return this.pokemonTypes.filter((type) => TUI_DEFAULT_MATCHER(type, search || ''));
   }
   
 }

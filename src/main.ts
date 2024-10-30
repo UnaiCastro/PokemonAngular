@@ -7,8 +7,9 @@ import { AppComponent } from './app/app.component';
 bootstrapApplication(AppComponent, {
   providers: [
         provideAnimations(),
-        appConfig.providers,
+        ...appConfig.providers,
         NG_EVENT_PLUGINS
     ]
 }).catch(err => console.error(err));
+
 
