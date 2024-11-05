@@ -1,0 +1,51 @@
+/* Colores de barra de progreso según el tipo */
+.bg-grass { background-color: #78C850; }
+.bg-fire { background-color: #F08030; }
+.bg-water { background-color: #6890F0; }
+.bg-electric { background-color: #F8D030; }
+.bg-ice { background-color: #98D8D8; }
+.bg-fighting { background-color: #C03028; }
+.bg-poison { background-color: #A040A0; }
+.bg-ground { background-color: #E0C068; }
+.bg-flying { background-color: #A890F0; }
+.bg-psychic { background-color: #F85888; }
+.bg-bug { background-color: #A8B820; }
+.bg-rock { background-color: #B8A038; }
+.bg-ghost { background-color: #705898; }
+.bg-dragon { background-color: #7038F8; }
+.bg-dark { background-color: #705848; }
+.bg-steel { background-color: #B8B8D0; }
+.bg-fairy { background-color: #EE99AC; }
+.bg-normal { background-color: #A8A878; }
+
+@keyframes colorChange {
+    0% {
+      color: #78C850;
+    }
+    25% {
+      color: #F08030;
+    }
+    50% {
+      color: #6890F0;
+    }
+    75% {
+      color: #F8D030;
+    }
+    100% {
+      color: #98D8D8;
+    }
+  }
+  
+  .pokemon-name {
+    font-size: 4rem;
+    font-weight: bold;
+    animation: colorChange 4s infinite alternate;
+    background: linear-gradient(90deg, #78C850, #F08030, #6890F0, #F8D030, #98D8D8);
+    -webkit-text-fill-color: transparent;
+  
+    &:hover {
+      transform: scale(1.1);
+      transition: transform 0.3s ease;
+    }
+  }
+  

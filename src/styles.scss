@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+    --primary-color: purple;
+    --primary-color-text: white;
+}
+
+@keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 6s linear infinite;
+  }

@@ -7,39 +7,33 @@ import { FormsModule } from '@angular/forms';
 import { TuiDataList } from '@taiga-ui/core';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
-
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ButtonModule } from 'primeng/button';
 
 import {NgForOf} from '@angular/common';
 import {TuiButton, TuiDropdown} from '@taiga-ui/core';
 import {TuiCheckbox, TuiChevron, TuiSwitch} from '@taiga-ui/kit';
 
-
-import {FormControl, ReactiveFormsModule} from '@angular/forms';
-import type {TuiBooleanHandler} from '@taiga-ui/cdk';
-import {TUI_DEFAULT_MATCHER, tuiPure} from '@taiga-ui/cdk';
-import {TuiDataListWrapper} from '@taiga-ui/kit';
- 
-const ITEMS: readonly string[] = [
-    'Luke Skywalker',
-    'Leia Organa Solo',
-    'Darth Vader',
-    'Han Solo',
-    'Obi-Wan Kenobi',
-    'Yoda',
-];
-
-
+interface Type {
+  name: string,
+  code: string
+}
 
 
 @Component({
   selector: 'app-main-page',  
   standalone: true,
-  imports: [RouterLink, RouterOutlet, CommonModule, TuiScrollbar, FormsModule, NgForOf, TuiButton, TuiCheckbox, TuiChevron, TuiSwitch, TuiDataList, TuiDropdown],
+  imports: [ButtonModule, MultiSelectModule, RouterLink, RouterOutlet, CommonModule, TuiScrollbar, FormsModule, NgForOf, TuiButton, TuiCheckbox, TuiChevron, TuiSwitch, TuiDataList, TuiDropdown],
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent implements OnInit {
+
+
+  types!: Type[];
+
+  selectedTypes!: Type[];
 
   pokemonDetailsList: any[] = [];
   filteredPokemonList: any[] = [];
@@ -52,8 +46,44 @@ export class MainPageComponent implements OnInit {
   ){}
 
   async ngOnInit(): Promise<void> {
+    this.loadType()
     await this.loadPokemon()
   }
+
+  loadType() : void{
+    this.types = [
+      { name: 'Normal', code: 'N' },
+      { name: 'Fighting', code: 'F' },
+      { name: 'Flying', code: 'FL' },
+      { name: 'Poison', code: 'P' },
+      { name: 'Ground', code: 'G' },
+      { name: 'Rock', code: 'R' },
+      { name: 'Bug', code: 'B' },
+      { name: 'Ghost', code: 'GH' },
+      { name: 'Steel', code: 'S' },
+      { name: 'Fire', code: 'FI' },
+      { name: 'Water', code: 'W' },
+      { name: 'Grass', code: 'GR' },
+      { name: 'Electric', code: 'E' },
+      { name: 'Psychic', code: 'PS' },
+      { name: 'Ice', code: 'I' },
+      { name: 'Dragon', code: 'D' },
+      { name: 'Dark', code: 'DK' },
+      { name: 'Fairy', code: 'FA' },
+      { name: 'Unknown', code: 'U' },
+      { name: 'Shadow', code: 'SH' }
+    ];
+  }
+
+  onTypeSelect(event: Event) {
+    /* const selectedOptions = (event.target as HTMLSelectElement).selectedOptions;
+    this.selectedTypes = Array.from(selectedOptions).map(option => option.value);
+    
+    this.filteredPokemonList = this.pokemonDetailsList.filter(pokemon => 
+      this.selectedTypes.length === 0 || pokemon.types.some(type => this.selectedTypes.includes(type.type.name))
+    ); */
+  }
+  
 
 
   async loadPokemon() {
@@ -64,7 +94,8 @@ export class MainPageComponent implements OnInit {
       );
       
       this.pokemonDetailsList = await Promise.all(pokemonPromises);
-      this.filteredPokemonList = [...this.pokemonDetailsList]; // Inicializa la lista filtrada aquí
+      this.filteredPokemonList = [...this.pokemonDetailsList];
+      
       await this.loadTypeIcons();
       console.log(this.pokemonDetailsList);
     } catch (error) {
@@ -80,7 +111,7 @@ export class MainPageComponent implements OnInit {
         pokemon.name.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     } else {
-      this.filteredPokemonList = [...this.pokemonDetailsList]; // Para mostrar todos si no hay término de búsqueda
+      this.filteredPokemonList = [...this.pokemonDetailsList];
     }
   }
   

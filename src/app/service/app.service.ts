@@ -35,4 +35,18 @@ export class AppService {
   getAllPokemonTypes(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/type`);
   }
+
+  getAbilityByUrl(url:string): Observable<any> {
+    return this.http.get<any>(url);
+  }
+
+  getItemByUrl(url:string): Observable<any> {
+    return this.http.get<any>(url);
+  }
+
+  getMoveByUrl(url:string): Observable<any> {
+    return this.http.get<any>(url);
+  }
+
+
 }

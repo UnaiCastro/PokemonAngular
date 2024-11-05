@@ -1,11 +1,124 @@
-<router-outlet>
-    <div *ngIf="pokemon">
-        <h1>{{ pokemon.name | titlecase }}</h1>
-        <img [src]="pokemon.sprites?.other['official-artwork']?.front_default" 
-             alt="{{ pokemon.name }}" 
-             style="width: 200px; height: auto;"/>
-      </div>
-</router-outlet>
 
+
+<router-outlet>
+  <div class="flex  min-h-screen bg-gradient-to-b from-black to-purple-900 text-white p-4 flex-col">
+
+      
+    <!-- Fondo animado -->
+    <div class="absolute inset-0 z-[-1] bg-gradient-to-b from-purple-700 via-purple-800 to-black rounded-xl animate-pulse"></div>
+
+    <!-- Nombre y Foto del Pokémon -->
+    <h1
+    class="text-7xl font-bold mb-4 justify-center text-center"
+    [ngClass]="{ 'bg-normal': !pokemon.types.length }"
+    [ngStyle]="{ background: getPokemonColor(), '-webkit-background-clip': 'text', 'color': 'transparent' }"
+  >
+    {{ pokemon.name | titlecase }}
+  </h1>    
+    
+    <div class="flex mb-6 items-center justify-center">
+      
+      <!-- Columna para las primeras 3 estadísticas (izquierda) -->
+      <div class="flex flex-col justify-between h-full items-end" [style.height.px]="320">
+        <div *ngFor="let stat of pokemonStats | slice:0:3" class="text-center space-y-1">
+          <label class="text-lg font-semibold">{{ stat.stat.name | titlecase }}</label>
+          <span class="text-sm font-semibold text-gray-300 ml-2">{{ stat.base_stat }}</span>
+          <div class="w-40 bg-gray-700 h-2 rounded">
+            <div
+              class="h-full rounded"
+              [ngClass]="getStatColorClass()"
+              [style.width.%]="stat.base_stat / 1.5"
+            ></div>
+          </div>          
+        </div>
+      </div>
+    
+      <!-- Imagen del Pokémon -->
+      <img 
+        [src]="pokemon.sprites?.other['official-artwork']?.front_default" 
+        alt="{{ pokemon.name }}" 
+        class="w-80 h-80 mx-40 my-4 transform transition-transform duration-500 hover:scale-105"
+      />
+    
+      <!-- Columna para las últimas 3 estadísticas (derecha) -->
+      <div class="flex flex-col justify-between h-full items-start" [style.height.px]="320">
+        <div *ngFor="let stat of pokemonStats | slice:3:6" class="text-center space-y-1">
+          <label class="text-lg font-semibold">{{ stat.stat.name | titlecase }}</label>
+          <span class="text-sm font-semibold text-gray-300 ml-2">{{ stat.base_stat }}</span>
+          <div class="w-40 bg-gray-700 h-2 rounded">
+            <div
+              class="h-full rounded"
+              [ngClass]="getStatColorClass()"
+              [style.width.%]="stat.base_stat / 1.5"
+            ></div>
+          </div>       
+        </div>
+      </div>
+    </div>
+
+    <!-- Peso y Altura -->
+    <div class="mb-6 flex-row flex space-x-9 justify-center">
+      <p class="text-lg font-medium"><strong>Height:</strong> {{ pokemon.height }} m</p>
+      <p class="text-lg font-medium"><strong>Weight:</strong> {{ pokemon.weight  }} kg</p>
+    </div>
+    
+    <!-- Tipos -->
+    <div class="flex justify-center space-x-9 mb-6">
+      <img *ngFor="let type of pokemon.types" [src]="type.iconUrl" [alt]="type.type.name" class="w-40 h-12">
+    </div>    
+
+    <!-- Habilidades -->
+    <div class="mb-6 justify-start">
+      <h2 class="text-2xl font-semibold text-pink-400 mb-2 ml-9">Abilities</h2>
+      <ul class="space-y-4">
+        <li *ngFor="let ability of abilities" class="p-4 mx-1 bg-gray-800 rounded-lg shadow-md">
+          <h3 class="font-medium text-xl underline text-pink-300 mb-2">{{ ability.name | titlecase }}</h3>
+          <p class="text-sm text-gray-300 mb-2"><strong>Effect:</strong> {{ ability.effect }}</p>
+          <p class="text-sm text-gray-400"><strong>Short Effect:</strong> {{ ability.shortEffect }}</p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="mb-6">
+      <h2 class="text-2xl font-semibold  text-blue-400 mb-2 ml-9">Held Items</h2>
+      <div *ngIf="heldItems.length > 0; else noItems" class="grid grid-cols-2 gap-4">
+        <div *ngFor="let item of heldItems" class="p-4 bg-gray-800 rounded-lg shadow-md flex space-x-4 items-start ml-9">
+          <img [src]="item.sprite" [alt]="item.name" class="w-12 h-12">
+          <div>
+            <h3 class="font-medium text-xl text-blue-300">{{ item.name | titlecase }}</h3>
+            <p class="text-sm text-gray-300"><strong>Attribute:</strong> {{ item.attribute | titlecase }}</p>
+            <p class="text-sm text-gray-300"><strong>Cost:</strong> {{ item.cost }} ₽</p>
+            <p class="text-sm text-gray-300"><strong>Category:</strong> {{ item.category | titlecase }}</p>
+            <p class="text-sm text-gray-300"><strong>Effect:</strong> {{ item.effect }}</p>
+          </div>
+        </div>
+      </div>
+      <ng-template #noItems>
+        <p class="text-gray-400 ml-11">No held items available.</p>
+      </ng-template>
+    </div>
+
+    <!-- Movimientos -->
+    <div class="mb-6">
+      <h2 class="text-2xl font-semibold  text-green-400 mb-2 ml-9">Level Zero Moves</h2>
+      <div *ngIf="levelZeroMoves.length > 0; else noMoves" class="grid grid-cols-1 md:grid-cols-3 gap-4 ml-9">
+        <div *ngFor="let move of levelZeroMoves" class="p-4 bg-gray-800 rounded-lg shadow-md">
+          <h3 class="text-xl font-bold text-green-300">{{ move.name | titlecase }}</h3>
+          <p class="text-sm text-gray-300"><strong>Type:</strong> {{ move.type | titlecase }}</p>
+          <p *ngIf="move.power" class="text-sm text-gray-300"><strong>Power:</strong> {{ move.power }}</p>
+          <p *ngIf="move.accuracy" class="text-sm text-gray-300"><strong>Accuracy:</strong> {{ move.accuracy }}%</p>
+          <p class="text-sm text-gray-300"><strong>PP:</strong> {{ move.pp }}</p>
+          <p *ngIf="move.priority !== 0" class="text-sm text-gray-300"><strong>Priority:</strong> {{ move.priority }}</p>
+          <p class="text-sm text-gray-300"><strong>Damage Info:</strong> {{ move.damageInfo }}</p>
+          <p class="text-sm text-gray-300"><strong>Effect:</strong> {{ move.effect }}</p>
+        </div>
+      </div>
+      <ng-template #noMoves>
+        <p class="text-gray-400 ml-11">No level zero moves available.</p>
+      </ng-template>
+    </div>
+  
+</div>
+</router-outlet>
 
   
